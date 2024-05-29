@@ -15,47 +15,45 @@ namespace TokoSayaAPI.Data
         
         }
 
-        public DbSet<Penjualan> Penjualan { get; set; }
-        public DbSet<Produk> Produk { get; set; }
-        public DbSet<PenjualanProduk> PenjualanProduk { get; set; }
-        public DbSet<Register> Register { get; set; }
-        public DbSet<Toko> Toko { get; set; }
-
+        public DbSet<User> Users { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Cashier> Cashiers { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<TransactionItem> TransactionItems { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Toko -> Register
-            modelBuilder.Entity<Toko>()
+            // User -> Cashier
+            modelBuilder.Entity<User>()
+                .HasKey(u => u.Id);
+            modelBuilder.Entity<Cashier>()
+                .HasKey(c => c.Id);
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Cashier)
+                .WithOne(c => c.User)
+                .HasForeignKey<Cashier>(c => c.Id)
+                .IsRequired();
+
+            // Cashier -> Transaction 1-m
+            modelBuilder.Entity<Transaction>()
                 .HasKey(t => t.Id);
-            modelBuilder.Entity<Register>()
-                .HasKey(r => r.Id);
-            modelBuilder.Entity<Toko>()
-                .HasOne(t => t.Register)
-                .WithOne(r => r.Toko)
-                .HasForeignKey<Register>(r => r.Id)
-                .IsRequired();
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.Cashier)
+                .WithMany(c => c.Transactions)
+                .HasForeignKey(c => c.CashierId);
 
-            // Register -> Penjualan
-            modelBuilder.Entity<Penjualan>()
-                .HasKey(p => p.Id);
-            modelBuilder.Entity<Register>()
-                .HasOne(r => r.Penjualan)
-                .WithOne(p => p.Register)
-                .HasForeignKey<Penjualan>(p => p.Id)
-                .IsRequired();
-
-            // Penjualan -> Produk m-m
-            modelBuilder.Entity<Produk>()
-                .HasKey(p => p.Id);
-            modelBuilder.Entity<PenjualanProduk>()
-                .HasKey(pp => new { pp.PenjualanId, pp.ProdukId });
-            modelBuilder.Entity<PenjualanProduk>()
-                .HasOne(pp => pp.Penjualan)
-                .WithMany(pj => pj.PenjualanProduk)
-                .HasForeignKey(pp => pp.PenjualanId);
-            modelBuilder.Entity<PenjualanProduk>()
-                .HasOne(pp => pp.Produk)
-                .WithMany(p => p.PenjualanProduk)
-                .HasForeignKey(pp => pp.ProdukId);
+            // Transaction -> Item m-m
+            modelBuilder.Entity<Item>()
+                .HasKey(i => i.Id);
+            modelBuilder.Entity<TransactionItem>()
+                .HasKey(ti => new {ti.TransactionId, ti.ItemId});
+            modelBuilder.Entity<TransactionItem>()
+                .HasOne(ti => ti.Transaction)
+                .WithMany(t => t.TransactionItems)
+                .HasForeignKey(ti => ti.TransactionId);
+            modelBuilder.Entity<TransactionItem>()
+                .HasOne(ti => ti.Item)
+                .WithMany(i => i.TransactionItems)
+                .HasForeignKey(ti => ti.ItemId);
         }
     }
 }
