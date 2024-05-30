@@ -31,6 +31,11 @@ namespace TokoSayaAPI.Repository
             return _context.Users.Where(u => u.Id == id).FirstOrDefault();
         }
 
+        public ICollection<User> GetUsers()
+        {
+            return _context.Users.OrderBy(u => u.Id).ToList();
+        }
+
         public bool IsUserExist(int id)
         {
             return _context.Users.Any(u => u.Id == id);
