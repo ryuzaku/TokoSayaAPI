@@ -8,7 +8,7 @@ namespace TokoSayaAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : Controller
+    public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepo;
 
@@ -41,7 +41,7 @@ namespace TokoSayaAPI.Controllers
             return Ok(new {message = "Sukses Mengambil Data", Data = usersMap});
         }
 
-        [HttpGet("{userId")]
+        [HttpGet("{userId}")]
         [ProducesResponseType(200, Type = typeof(UserDto))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
