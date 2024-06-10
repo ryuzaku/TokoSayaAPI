@@ -13,12 +13,11 @@ namespace TokoSayaAPI.Repository
             _context = context;
         }
 
-        public Transaction MakeTransaction(Transaction transaction, Cashier cashier)
+        public bool MakeTransaction(Transaction transaction)
         {
-            transaction.Cashier = cashier;
             _context.Add(transaction);
-            _context.SaveChanges();
-            return transaction;
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }

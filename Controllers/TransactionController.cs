@@ -93,23 +93,5 @@ namespace TokoSayaAPI.Controllers
 
             return Ok(new { message = "Sukses Mengambil Data", data = itemsMap });
         }
-
-        [HttpGet("total/{tId}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public IActionResult GetTotalItemPriceOfTransaction(int tId)
-        {
-            if (!_transRepo.IsTransactionExist(tId))
-                return NotFound("Transaksi tidak ada");
-
-            var transactionItems = _transRepo.GetTransactionItems(tId).ToList();
-            var totalItemsPrice = _transRepo.TotalItemPrice(transactionItems);
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(totalItemsPrice);
-        }
     }
 }
